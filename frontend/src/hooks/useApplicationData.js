@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react';
+import { useReducer } from 'react';
 import axios from 'axios';
 
 import photos from 'mocks/photos';
@@ -33,7 +33,7 @@ const reducer = (state, action) => {
     case ACTIONS.SET_TOPIC_DATA:
       return { ...state, topicData: action.payload };
     case ACTIONS.SELECT_PHOTO:
-      const modalPhoto = photos.find((photo) => photo.id === action.payload);
+      const modalPhoto = state.photoData.find((photo) => photo.id === action.payload);
       return { ...state, modalData: modalPhoto };
     default:
       return state;
