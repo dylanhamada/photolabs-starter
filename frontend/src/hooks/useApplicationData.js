@@ -1,67 +1,71 @@
-import { useState } from 'react';
+import { useEffect, useReducer } from 'react';
 
 import photos from 'mocks/photos';
 
-const useApplicationData = () => {
-  const [state, setState] = useState({
-    favPhotos: [],
-    modal: false,
-    modalData: {}
-  });
-  
-  // work on updateToFavPhotoIds
+export const ACTIONS = {
+  FAV_PHOTO_ADDED: 'FAV_PHOTO_ADDED',
+  FAV_PHOTO_REMOVED: 'FAV_PHOTO_REMOVED',
+  SET_PHOTO_DATA: 'SET_PHOTO_DATA',
+  SET_TOPIC_DATA: 'SET_TOPIC_DATA',
+  SELECT_PHOTO: 'SELECT_PHOTO',
+  DISPLAY_PHOTO_DETAILS: 'DISPLAY_PHOTO_DETAILS'
+};
+
+const initialState = {
+  photoData: [],
+  topicData: [],
+  favPhotos: [],
+  modal: false,
+  modalData: {}
+}
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case ACTIONS.FAV_PHOTO_ADDED:
+      return { ...state, favPhotos: [...state.favPhotos, action.payload] };
+    case ACTIONS.FAV_PHOTO_REMOVED:
+      return { ...state, favPhotos: state.favPhotos.filter((fav) => fav !== action.payload) };
+    case ACTIONS.SET_PHOTO_DATA:
+      return { ...state, photoData: action.payload };
+    case ACTIONS.DISPLAY_PHOTO_DETAILS:
+      return { ...state, modal: action.payload };
+    case ACTIONS.SET_TOPIC_DATA:
+      return { ...state, topicData: action.payload };
+    case ACTIONS.SELECT_PHOTO:
+      const modalPhoto = photos.find((photo) => photo.id === action.payload);
+      return { ...state, modalData: modalPhoto };
+    default:
+      return state;
+  }
+};
+
+export const useApplicationData = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
   const updateToFavPhotoIds = (newFav) => {
     const favExists = state.favPhotos.includes(newFav);
 
     if (favExists) {
-      const updatedFav = state.favPhotos.filter(fav => fav !== newFav);
-      console.log('updateToFavPhotoIds, calling setState to remove favorite');
-      setState({
-        ...state,
-        favPhotos: updatedFav
-      });
+      dispatch({ type: ACTIONS.FAV_PHOTO_REMOVED, payload: newFav });
     } else {
-      const newFavPhotosArray = [...state.favPhotos, newFav];
-      
-      console.log('updateToFavPhotoIds, calling setState to add favorite');
-      setState({
-        ...state,
-        favPhotos: newFavPhotosArray
-      });
+      dispatch({ type: ACTIONS.FAV_PHOTO_ADDED, payload: newFav });
     }
-  }
-  
-  // work on onClosePhotoDetailsModal
-  const onClosePhotoDetailsModal = () => {
-    setState({
-      ...state,
-      modal: false
-    });
   };
 
-  // work on setPhotoSelected
+  const onClosePhotoDetailsModal = () => {
+    dispatch({ type: ACTIONS.DISPLAY_PHOTO_DETAILS, payload: false });
+  };
+
   const setPhotoSelected = (photoId) => {
-    const findPhoto = (id) => {
-      return photos.find(photo => {
-        return photo.id === id;
-      });
-    };
-
-    const modalPhoto = findPhoto(photoId);
-
-    setState({
-      ...state,
-      modal: true,
-      modalData: modalPhoto
-    });
+    dispatch({ type: ACTIONS.DISPLAY_PHOTO_DETAILS, payload: true });
+    dispatch({ type: ACTIONS.SELECT_PHOTO, payload: photoId });
   };
 
   return {
-    state, 
-    updateToFavPhotoIds, 
-    onClosePhotoDetailsModal, 
-    setPhotoSelected
+    state,
+    dispatch,
+    updateToFavPhotoIds,
+    onClosePhotoDetailsModal,
+    setPhotoSelected,
   };
 };
-
-export default useApplicationData;
