@@ -1,4 +1,5 @@
 import { useEffect, useReducer } from 'react';
+import axios from 'axios';
 
 import photos from 'mocks/photos';
 
@@ -61,11 +62,22 @@ export const useApplicationData = () => {
     dispatch({ type: ACTIONS.SELECT_PHOTO, payload: photoId });
   };
 
+  const loadPhotosByTopic = (topicId) => {
+    axios.get(`api/topics/photos/${topicId}`)
+      .then(res => {
+        dispatch({
+          type: 'SET_PHOTO_DATA',
+          payload:res.data
+        });
+      });
+  };
+
   return {
     state,
     dispatch,
     updateToFavPhotoIds,
     onClosePhotoDetailsModal,
     setPhotoSelected,
+    loadPhotosByTopic
   };
 };

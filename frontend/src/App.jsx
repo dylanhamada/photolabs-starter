@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
 
 import HomeRoute from 'components/HomeRoute';
@@ -6,16 +6,16 @@ import PhotoDetailsModal from 'components/PhotoDetailsModal';
 
 import './App.scss';
 
-import topics from './mocks/topics';
 import { useApplicationData } from 'hooks/useApplicationData';
-// Note: Rendering a single component to build components in isolation
+
 const App = () => {
   const {
     state,
     dispatch,
     updateToFavPhotoIds,
     onClosePhotoDetailsModal,
-    setPhotoSelected
+    setPhotoSelected,
+    loadPhotosByTopic
   } = useApplicationData();
 
   useEffect(() => {
@@ -53,6 +53,7 @@ const App = () => {
         setPhotoSelected={setPhotoSelected}
         favPhotos={state.favPhotos}
         updateToFavPhotoIds={updateToFavPhotoIds}
+        loadPhotosByTopic={loadPhotosByTopic}
       />
     </div>
   );
